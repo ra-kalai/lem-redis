@@ -19,9 +19,10 @@ all: $(clib)
 
 .PHONY: test
 
-lem/redis.so: lem/redis.c
+
+$(clib): lem/redis.c hiredis/async.c
 	$(CC) $(CFLAGS) $(LDFLAGS) \
-   $^ $(hiredis_src_files) \
+   lem/redis.c $(hiredis_src_files) \
 	 -o $@ 
 	@echo
 	@echo '####################################################################'
@@ -34,6 +35,10 @@ lem/redis.so: lem/redis.c
 	@echo '#'
 	@echo '####################################################################'
 	@echo
+
+hiredis/async.c:
+	git submodule init
+	git submodule update
 
 install: $(clib)
 	install -m 644 $< $(cmoddir)/lem
