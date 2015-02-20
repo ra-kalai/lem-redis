@@ -123,12 +123,13 @@ Performance
 License
 -------
 
-lem-redis is free software. It is distributed under the terms of the
-[GNU General Public License][gpl].
+lem-redis is free software. It is distributed both under the terms of the
+[GNU General Public License][gpl] any revision, and the [GNU Lesser General Public License][lgpl] any revision.   
 Except _lem/hiredis-boilerplate.c_ and hiredis/* which are under a
 [Three clause BSD license][threeclosebsd]
 
 [gpl]: http://www.fsf.org/licensing/licenses/gpl.html
+[lgpl]: http://www.fsf.org/licensing/licenses/lgpl.html
 [threeclosebsd]: https://raw.githubusercontent.com/redis/hiredis/master/COPYING
 
 

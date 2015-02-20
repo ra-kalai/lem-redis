@@ -45,7 +45,6 @@ install: $(clib)
 
 test:
 	lem test/test.lua
-	@echo 'yay! =)'
 
 clean:
 	rm -f lem/redis.so
