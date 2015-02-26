@@ -33,6 +33,7 @@
 
 typedef struct RedisLibevEvents {
   redisAsyncContext *context;
+  struct ev_loop *loop;
   int reading, writing;
   ev_io rev, wev;
   lua_State *S;
@@ -46,6 +47,9 @@ typedef struct RedisLibevEvents {
 
 static void
 redisLibevReadEvent(EV_P_ ev_io *watcher, int revents) {
+#if EV_MULTIPLICITY
+  ((void)loop);
+#endif
   ((void)revents);
   RedisLibevEvents *e = (RedisLibevEvents*)watcher->data;
   redisAsyncHandleRead(e->context);
@@ -53,6 +57,9 @@ redisLibevReadEvent(EV_P_ ev_io *watcher, int revents) {
 
 static void
 redisLibevWriteEvent(EV_P_ ev_io *watcher, int revents) {
+#if EV_MULTIPLICITY
+  ((void)loop);
+#endif
   ((void)revents);
   RedisLibevEvents *e = (RedisLibevEvents*)watcher->data;
   redisAsyncHandleWrite(e->context);
@@ -61,6 +68,9 @@ redisLibevWriteEvent(EV_P_ ev_io *watcher, int revents) {
 static void
 redisLibevAddRead(void *privdata) {
   RedisLibevEvents *e = (RedisLibevEvents*)privdata;
+  struct ev_loop *loop = e->loop;
+  ((void)loop);
+
   if (!e->reading) {
     e->reading = 1;
     ev_io_start(EV_A_ &e->rev);
@@ -70,6 +80,9 @@ redisLibevAddRead(void *privdata) {
 static void
 redisLibevDelRead(void *privdata) {
   RedisLibevEvents *e = (RedisLibevEvents*)privdata;
+  struct ev_loop *loop = e->loop;
+  ((void)loop);
+
 
   if (e->reading) {
     e->reading = 0;
@@ -80,6 +93,7 @@ redisLibevDelRead(void *privdata) {
 static void
 redisLibevAddWrite(void *privdata) {
   RedisLibevEvents *e = (RedisLibevEvents*)privdata;
+  struct ev_loop *loop = e->loop;
 
   if (!e->writing) {
     e->writing = 1;
@@ -90,6 +104,7 @@ redisLibevAddWrite(void *privdata) {
 static void
 redisLibevDelWrite(void *privdata) {
   RedisLibevEvents *e = (RedisLibevEvents*)privdata;
+  struct ev_loop *loop = e->loop;
 
   if (e->writing) {
     e->writing = 0;
@@ -111,8 +126,14 @@ redisLibevAttach(EV_P_ redisAsyncContext *ac, RedisLibevEvents *e) {
   /* Nothing should be attached when something is already attached */
   if (ac->ev.data != NULL)
     return REDIS_ERR;
+
   /* Create container for context and r/w events */
   e->context = ac;
+#if EV_MULTIPLICITY
+    e->loop = loop;
+#else
+    e->loop = NULL;
+#endif
   e->reading = e->writing = 0;
   e->rev.data = e;
   e->wev.data = e;

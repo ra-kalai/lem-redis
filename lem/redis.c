@@ -47,7 +47,7 @@ static const char
   #endif
 #endif
 
-#if LUA_VERSION_NUM == 502
+#if LUA_VERSION_NUM >= 502
   #if LUAI_MAXSTACK < LEM_REDIS_MAX_ARGS
 	  #error define a valid LEM_REDIS_MAX_ARGS by yourself
   #endif
